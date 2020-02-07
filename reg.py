@@ -1,3 +1,8 @@
+#https://subscription.packtpub.com/video/data/9781838987671/p6/video6_10/underfitting-and-overfitting
+
+
+#https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781787286382/12/ch12lvl1sec107/create-a-simple-estimator
+
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
