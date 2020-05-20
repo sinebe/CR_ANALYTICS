@@ -102,11 +102,27 @@ class MyOlr(GenericLikelihoodModel):
         i =theta0[:self.q-1]
         i =list(np.cumsum(i))
         theta0= i + theta0[self.q-1:]
-        theta0 = np.array([-2, 1, 4, 1, -1])
+        # theta0 = np.array([-2, 1, 4, 1, -1])
         #TODO:
         # Add constraints. It fits better
-        return super(MyOlr, self).fit(start_params=theta0, method='minimize', min_method='slsqp',options = {'maxiter': 500, 'disp': True})
 
+
+        constraints = self.constraints(self.q)
+        # constraints = [{'type': 'ineq', 'fun': lambda x: x[2] - x[1]}, {'type': 'ineq', 'fun': lambda x: x[1] - x[0]},
+        #                {'type': 'ineq', 'fun': lambda x: x[2] - x[0]}]
+
+        res = super(MyOlr, self).fit(start_params=theta0, method='minimize', min_method='Nelder-Mead',   constraints =constraints)
+        return res
+
+    def constraints(self, q):
+        import itertools
+        constraints = []
+        idx = np.arange(q - 1)
+        idx = -np.sort(-idx)
+        for comb in itertools.combinations(np.array(idx), 2):
+            print(comb)
+            constraints.append({'type': 'ineq', 'fun': lambda x: x[comb[0]] - x[comb[1]]})
+        return  constraints
 
     def loglike(self, theta):
 
@@ -130,7 +146,7 @@ class MyOlr(GenericLikelihoodModel):
 
         for cls in range(q - 2):
             c_ll[cls + 1] = np.sum(np.log(self.cdf(a[cls + 1] + XB) - self.cdf(a[cls] + XB))[y == c[cls + 1]])
-
+        print(np.sum(c_ll), theta )
         return np.sum(c_ll)
 
     def cdf(self, X):
@@ -159,9 +175,9 @@ class MyOlr(GenericLikelihoodModel):
 
 mod = MyOlr(endog, exog, descending=True) #
 
-mod.exog_names
-mod.exog
-exog
+# mod.exog_names
+# mod.exog
+# exog
 res = mod.fit()#.fit(start_params=theta0, method='minimize', use_t=True, min_method='slsqp' ,constraints=cons)
 
 
